@@ -12,16 +12,16 @@ import clsx from 'clsx';
 const mockUsers = [
   {
     id: '1',
-    name: 'John Doe',
-    email: 'john@example.com',
+    name: 'Anupam Singh',
+    email: 'anupam@example.com',
     roleId: '1',
     isActive: true,
     createdAt: new Date().toISOString(),
   },
   {
     id: '2',
-    name: 'Jane Smith',
-    email: 'jane@example.com',
+    name: 'Alok Singh',
+    email: 'alok@example.com',
     roleId: '2',
     isActive: true,
     createdAt: new Date().toISOString(),
