@@ -73,7 +73,7 @@ export const Sidebar = ({ activeTab, setActiveTab, isOpen }) => {
             })}
           >
             <div className="text-sm text-gray-400">
-              <p>Version 1.0.0</p>
+              <p>Made by Anupam</p>
             </div>
           </div>
         </div>
