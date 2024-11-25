@@ -10,9 +10,9 @@ export const Header = () => {
     <header className="bg-white dark:bg-gray-800 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          {/* <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-bold text-gray-800 dark:text-white">RBAC-UI</h1>
-          </div> */}
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-bold text-gray-800 dark:text-white"></h1>
+          </div>
           <div className="flex items-center space-x-4">
             <button
               onClick={toggleDarkMode}
