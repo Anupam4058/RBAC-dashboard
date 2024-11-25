@@ -72,22 +72,28 @@ function App() {
       'bg-gray-50': !isDarkMode,
       'bg-gray-900': isDarkMode
     })}>
-      <div className="flex min-h-screen">
+      <div className="rowcol">
+        <div className="flex min-h-screen col-1">
         <Sidebar
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           isOpen={isSidebarOpen}
         />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col col">
+          <div className='rowcol'>
           <Header
             isSidebarOpen={isSidebarOpen}
             toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           />
+          <div className='row'></div>
           <main className="flex-1 p-4 md:p-8 pt-20 transition-all duration-200">
             <div className="max-w-7xl mx-auto">{renderContent()}</div>
           </main>
+          
+          </div>
         </div>
         <Toaster position="top-right" />
+        </div>
       </div>
     </div>
   );
