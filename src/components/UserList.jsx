@@ -1,190 +1,137 @@
 import React, { useState } from 'react';
-import { Edit2, Trash2, UserPlus, AlertCircle, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useStore } from '../store';
 import { UserModal } from './UserModal';
-import toast from 'react-hot-toast';
 
 export const UserList = () => {
-  const { users, roles, deleteUser, updateUser } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const users = useStore((state) => state.users);
+  const roles = useStore((state) => state.roles);
 
   const handleEdit = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
   };
 
-  const toggleStatus = async (user) => {
-    try {
-      setIsLoading(true);
-      await updateUser({ ...user, isActive: !user.isActive });
-      toast.success(`User ${user.isActive ? 'deactivated' : 'activated'} successfully`);
-    } catch (error) {
-      toast.error('Failed to update user status');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDelete = async (userId) => {
-    try {
-      setIsLoading(true);
-      await deleteUser(userId);
-      toast.success('User deleted successfully');
-      setShowDeleteConfirm(null);
-    } catch (error) {
-      toast.error('Failed to delete user');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAddNew = () => {
+  const handleAdd = () => {
     setSelectedUser(null);
     setIsModalOpen(true);
   };
 
-  // Loading skeleton
-  const LoadingSkeleton = () => (
-    <div className="animate-pulse">
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="h-16 bg-gray-200 rounded-lg mb-4" />
-      ))}
-    </div>
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Users</h2>
-        <button
-          onClick={handleAddNew}
-          className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          <UserPlus className="w-4 h-4 mr-2" />
-          Add User
-        </button>
+    <div className="p-6">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Users</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Manage your application users and their roles
+            </p>
+          </div>
+          <button
+            onClick={handleAdd}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Add User
+          </button>
+        </div>
       </div>
 
-      {isLoading ? (
-        <LoadingSkeleton />
-      ) : (
-        <div className="overflow-x-auto -mx-4 sm:-mx-6">
-          <div className="inline-block min-w-full align-middle">
-            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Name
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Email
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Role
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
+      {/* Users Table */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700/50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  User
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Role
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Created At
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {filteredUsers.map((user) => {
+                const role = roles.find((r) => r.id === user.roleId);
+                return (
+                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                          <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                            {user.name.split(' ').map(n => n[0]).join('')}
+                          </span>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {user.name}
+                          </div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {user.email}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-3 py-1 text-sm rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400">
+                        {role?.name || 'No Role'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-3 py-1 text-sm rounded-full ${
+                        user.isActive
+                          ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400'
+                          : 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400'
+                      }`}>
+                        {user.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={() => handleEdit(user)}
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg px-3 py-1 transition-colors duration-200"
+                      >
+                        Edit
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="h-10 w-10 flex-shrink-0">
-                            <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                              <span className="text-sm font-medium text-gray-600">
-                                {user.name.charAt(0)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {user.name}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{user.email}</div>
-                      </td>
-                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {roles.find((r) => r.id === user.roleId)?.name}
-                        </div>
-                      </td>
-                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                        <button
-                          onClick={() => toggleStatus(user)}
-                          disabled={isLoading}
-                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full transition-colors ${
-                            user.isActive
-                              ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                              : 'bg-red-100 text-red-800 hover:bg-red-200'
-                          }`}
-                        >
-                          {user.isActive ? 'Active' : 'Inactive'}
-                        </button>
-                      </td>
-                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-3">
-                          <button
-                            onClick={() => handleEdit(user)}
-                            className="text-blue-600 hover:text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full p-1"
-                            aria-label="Edit user"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                          {showDeleteConfirm === user.id ? (
-                            <div className="flex items-center space-x-2">
-                              <button
-                                onClick={() => handleDelete(user.id)}
-                                className="text-red-600 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-full p-1"
-                                aria-label="Confirm delete"
-                              >
-                                <AlertCircle className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => setShowDeleteConfirm(null)}
-                                className="text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded-full p-1"
-                                aria-label="Cancel delete"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setShowDeleteConfirm(user.id)}
-                              className="text-red-600 hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-full p-1"
-                              aria-label="Delete user"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-      )}
+      </div>
 
-      <UserModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        user={selectedUser}
-      />
+      {/* User Modal */}
+      <div className="mt-8">
+        <UserModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          user={selectedUser}
+        />
+      </div>
     </div>
   );
 };

@@ -1,108 +1,105 @@
 import React, { useState } from 'react';
-import { Edit2, Trash2, Shield } from 'lucide-react';
+import { Plus, Shield } from 'lucide-react';
 import { useStore } from '../store';
 import { RoleModal } from './RoleModal';
 
 export const RoleList = () => {
-  const { roles, deleteRole } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const roles = useStore((state) => state.roles);
 
   const handleEdit = (role) => {
     setSelectedRole(role);
     setIsModalOpen(true);
   };
 
-  const handleAddNew = () => {
+  const handleAdd = () => {
     setSelectedRole(null);
     setIsModalOpen(true);
   };
 
-  return (
-    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Roles</h2>
-        <button
-          onClick={handleAddNew}
-          className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Shield className="w-4 h-4 mr-2" />
-          Add Role
-        </button>
-      </div>
+  const filteredRoles = roles.filter((role) =>
+    role.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    role.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-      <div className="overflow-x-auto -mx-4 sm:-mx-6">
-        <div className="inline-block min-w-full align-middle">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Description
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Permissions
-                </th>
-                <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {roles.map((role) => (
-                <tr key={role.id} className="hover:bg-gray-50">
-                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {role.name}
-                    </div>
-                  </td>
-                  <td className="px-4 sm:px-6 py-4">
-                    <div className="text-sm text-gray-500">{role.description}</div>
-                  </td>
-                  <td className="px-4 sm:px-6 py-4">
-                    <div className="flex flex-wrap gap-2">
-                      {role.permissions.map((permission) => (
-                        <span
-                          key={permission}
-                          className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800"
-                        >
-                          {permission}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-3">
-                      <button
-                        onClick={() => handleEdit(role)}
-                        className="text-blue-600 hover:text-blue-900"
-                        aria-label="Edit role"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => deleteRole(role.id)}
-                        className="text-red-600 hover:text-red-900"
-                        aria-label="Delete role"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+  return (
+    <div className="p-6">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Roles</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Manage user roles and their permissions
+            </p>
+          </div>
+          <button
+            onClick={handleAdd}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Add Role
+          </button>
         </div>
       </div>
 
-      <RoleModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        role={selectedRole}
-      />
+      {/* Roles Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredRoles.map((role) => (
+          <div
+            key={role.id}
+            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow duration-200"
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {role.name}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {role.description}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => handleEdit(role)}
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg px-3 py-1 transition-colors duration-200"
+              >
+                Edit
+              </button>
+            </div>
+            <div className="mt-4">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Permissions
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {role.permissions.map((permission) => (
+                  <span
+                    key={permission}
+                    className="px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                  >
+                    {permission}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Role Modal */}
+      <div className="mt-8">
+        <RoleModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          role={selectedRole}
+        />
+      </div>
     </div>
   );
 };
