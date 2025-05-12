@@ -45,7 +45,7 @@ const mockRoles = [
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { setUsers, setRoles, isDarkMode } = useStore();
 
   useEffect(() => {
@@ -72,29 +72,21 @@ function App() {
       'bg-gray-50': !isDarkMode,
       'bg-gray-900': isDarkMode
     })}>
-      <div className="rowcol">
-        <div className="flex min-h-screen col-1">
-        <Sidebar
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          isOpen={isSidebarOpen}
-        />
-        <div className="flex-1 flex flex-col col">
-          <div className='rowcol'>
-          <Header
-            isSidebarOpen={isSidebarOpen}
-            toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-          />
-          <div className='row'></div>
-          <main className="flex-1 p-4 md:p-8 pt-20 transition-all duration-200">
-            <div className="max-w-7xl mx-auto">{renderContent()}</div>
-          </main>
-          
-          </div>
+      <Header toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={(tab) => {
+          setActiveTab(tab);
+          setIsSidebarOpen(false);
+        }}
+        isOpen={isSidebarOpen}
+      />
+      <main className="pt-16 p-4 md:p-8 transition-all duration-200">
+        <div className="max-w-7xl mx-auto">
+          {renderContent()}
         </div>
-        <Toaster position="top-right" />
-        </div>
-      </div>
+      </main>
+      <Toaster position="top-right" />
     </div>
   );
 }
